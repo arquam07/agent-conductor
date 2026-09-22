@@ -27,7 +27,7 @@ class AgentState(TypedDict):
 
 
 def _build_llm():
-    llm = ChatAnthropic(model=settings.llm_model, temperature=0)
+    llm = ChatAnthropic(model=settings.llm_model)
     return llm.bind_tools(TOOLS)
 
 

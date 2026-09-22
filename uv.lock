@@ -5,10 +5,11 @@ requires-python = ">=3.12"
 [[package]]
 name = "agent-conductor"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "langchain-anthropic" },
+    { name = "langchain-core" },
     { name = "langgraph" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
@@ -25,20 +26,21 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fastapi", specifier = ">=0.141.1" },
-    { name = "langchain-anthropic", specifier = ">=1.7.2" },
-    { name = "langgraph", specifier = ">=1.2.11" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.5" },
-    { name = "pydantic", specifier = ">=2.13.5" },
-    { name = "redis", specifier = ">=8.1.0" },
-    { name = "sqlalchemy", specifier = ">=2.0.52" },
-    { name = "uvicorn", specifier = ">=0.52.4" },
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "langchain-anthropic", specifier = ">=0.2" },
+    { name = "langchain-core", specifier = ">=0.3" },
+    { name = "langgraph", specifier = ">=0.2" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
+    { name = "pydantic", specifier = ">=2.0" },
+    { name = "redis", specifier = ">=5.0" },
+    { name = "sqlalchemy", specifier = ">=2.0" },
+    { name = "uvicorn", specifier = ">=0.30" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "httpx", specifier = ">=0.27" },
+    { name = "pytest", specifier = ">=8.0" },
 ]
 
 [[package]]

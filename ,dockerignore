@@ -1,0 +1,15 @@
+# Keep the build context lean
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.git/
+.gitignore
+.env
+.pytest_cache/
+*_debug_*.log
+docs/
+k8s/
+README.md
+.github/

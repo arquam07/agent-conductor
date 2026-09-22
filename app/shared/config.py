@@ -14,7 +14,7 @@ class Settings:
 
     # Agent
     max_steps: int = int(os.getenv("AGENT_MAX_STEPS", "8"))
-    llm_model: str = os.getenv("LLM_MODEL", "claude-sonnet-4-5")
+    llm_model: str = os.getenv("LLM_MODEL", "claude-sonnet-5")
 
     # Worker
     poll_timeout: int = int(os.getenv("WORKER_POLL_TIMEOUT", "5"))  # seconds
