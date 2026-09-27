@@ -1,0 +1,24 @@
+# Non-secret config. These are the same env vars the app reads (see config.py).
+# Service DNS names (redis, postgres) resolve inside the namespace.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: agent-conductor
+data:
+  REDIS_URL: "redis://redis:6379/0"
+  DATABASE_URL: "postgresql+psycopg://postgres:postgres@postgres:5432/agentflow"
+  LLM_MODEL: "claude-sonnet-5"
+---
+# Secrets. stringData lets us write plain values; K8s stores them base64.
+# For a portfolio project this is fine committed as a template, BUT: replace
+# the API key locally and do NOT commit the real key. See note in README.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: agent-conductor
+type: Opaque
+stringData:
+  ANTHROPIC_API_KEY: "REPLACE_ME"
+  POSTGRES_PASSWORD: "postgres"

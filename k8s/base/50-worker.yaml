@@ -1,0 +1,44 @@
+# Worker is STATELESS and not a server -> Deployment, NO Service.
+# It pulls jobs from the queue; nothing connects TO it, so no Service needed.
+# replicas: 1 for now. In the KEDA step this count becomes dynamic (scales on
+# queue depth). Same image as the API, different command -> the whole point of
+# building one image.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: agent-conductor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      # Give in-flight jobs time to finish on shutdown (graceful SIGTERM).
+      # K8s sends SIGTERM, waits up to this long, then SIGKILL.
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: worker
+          image: agent-conductor-worker:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "app.worker.main"]
+          envFrom:
+            - configMapRef:
+                name: app-config
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ANTHROPIC_API_KEY
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

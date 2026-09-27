@@ -1,0 +1,22 @@
+# The Ingress resource: routing rules for the NGINX controller.
+# Sends all requests on "/" to the api Service on port 8000.
+# This is the "instruction sheet"; the controller (installed separately) acts on it.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  namespace: agent-conductor
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8000

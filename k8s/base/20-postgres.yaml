@@ -1,0 +1,77 @@
+# Postgres as a StatefulSet, not a Deployment, because it's STATEFUL:
+# - stable network identity (pod is always postgres-0)
+# - its own persistent volume that survives pod restarts/rescheduling
+# volumeClaimTemplates creates a PVC per replica; the data lives there, not
+# in the pod. Kill the pod -> new pod re-attaches the same volume -> data safe.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: agent-conductor
+spec:
+  serviceName: postgres      # ties to the headless Service below
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_DB
+              value: agentflow
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: POSTGRES_PASSWORD
+            # Data subdir avoids issues with the mounted volume's lost+found
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+# Headless Service (clusterIP: None) gives StatefulSet pods stable DNS.
+# App connects to "postgres" and resolves to postgres-0.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: agent-conductor
+spec:
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

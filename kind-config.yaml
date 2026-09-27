@@ -1,0 +1,21 @@
+# kind cluster config with ingress support.
+# Must be passed at cluster-creation time (--config); these can't be added later.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    # Label so the NGINX ingress controller schedules onto this node
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    # Map host ports 80/443 into the cluster so localhost reaches the ingress
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
